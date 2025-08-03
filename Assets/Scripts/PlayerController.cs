@@ -12,10 +12,15 @@ public class PlayerController : NetworkBehaviour
     [SyncVar(hook = nameof(OnNicknameChanged))] 
     public string nickname;
     [SerializeField] private TMP_Text nicknameText;
+    
+    [Header("Animation")]
+    [SerializeField] private Animator animator;
+    private Vector3 lastPosition;
 
     private void Start()
     {
         characterController = GetComponent<CharacterController>();
+        animator = GetComponent<Animator>();
         
         if (isLocalPlayer)
         {
@@ -39,15 +44,25 @@ public class PlayerController : NetworkBehaviour
     {
         if (!isLocalPlayer) return;
 
-        // Движение WASD
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
-        Vector3 move = transform.right * horizontal + transform.forward * vertical;
-        characterController.Move(move * speed * Time.deltaTime);
+        PlayerMovement();
+        
         if (Input.GetKeyDown(KeyCode.Space))
         {
             CmdSendChatMessage();
         }
+    }
+
+    // Движение WASD
+    private void PlayerMovement()
+    {
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
+        Vector3 move = transform.right * horizontal + transform.forward * vertical;
+        characterController.Move(move * speed * Time.deltaTime);
+        
+        bool isRunning = (transform.position - lastPosition).magnitude > 0.001f;
+        animator.SetBool("IsRunning", isRunning);
+        lastPosition = transform.position;
     }
 
     [Command]
