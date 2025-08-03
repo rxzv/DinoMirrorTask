@@ -17,11 +17,13 @@ public class PlayerNickname : MonoBehaviour
     private void Awake()
     {
         _playerTransform = transform;
+        if (_nicknameText == null)
+            Debug.LogError("TMP_Text не назначен в PlayerNickname!");
     }
 
     private void Update()
     {
-        if (Camera.main == null) return;
+        if (Camera.main == null || _nicknameText == null) return;
         
         _nicknameText.transform.position = _playerTransform.position + Vector3.up * _verticalOffset;
         _nicknameText.transform.rotation = Quaternion.LookRotation(

@@ -9,17 +9,24 @@ public class PlayerIdentity : NetworkBehaviour
 {   
     [SyncVar(hook = nameof(OnNicknameChanged))] 
     private string _nickname = "Player";
-    public string Nickname { get { return _nickname; }}
+    public string Nickname => _nickname;
 
     private PlayerNickname _nicknameDisplay;
     
     private void Start()
     {
         _nicknameDisplay = GetComponent<PlayerNickname>();
-        if (!isLocalPlayer) return;
-        string defaultNick = "Player" + Random.Range(1000, 9999);
-        string savedNick = PlayerPrefs.GetString("PlayerNick", defaultNick);
-        CmdSetNickname(savedNick);
+        
+        if (isLocalPlayer)
+        {
+            string defaultNick = "Player" + Random.Range(1000, 9999);
+            string savedNick = PlayerPrefs.GetString("PlayerNick", defaultNick);
+            CmdSetNickname(savedNick);
+        }
+        else
+        {
+            OnNicknameChanged("", _nickname);
+        }
     }
     
     [Command]
@@ -30,6 +37,7 @@ public class PlayerIdentity : NetworkBehaviour
 
     private void OnNicknameChanged(string _, string newNick)
     {
-        _nicknameDisplay.UpdateNickname(newNick);
+        if (_nicknameDisplay != null)
+            _nicknameDisplay.UpdateNickname(newNick);
     }
 }

@@ -19,6 +19,7 @@ public class UIManager : MonoBehaviour
 
     public void OnSpawnPlayerBtnClicked()
     {
+        SaveNickname();
         NetworkClient.Ready();
         NetworkClient.AddPlayer();
         _nicknamePanel.SetActive(false);
@@ -28,9 +29,7 @@ public class UIManager : MonoBehaviour
     {
         string nickname = _nicknameInput.text;
         if (string.IsNullOrWhiteSpace(nickname))
-        {
             nickname = "Player" + Random.Range(1000, 9999);
-        }
         
         PlayerPrefs.SetString("PlayerNick", nickname);
     }

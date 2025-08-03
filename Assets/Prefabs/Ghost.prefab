@@ -473,7 +473,6 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  _animator: {fileID: 8521662684650882391}
 --- !u!114 &3844075516317520296
 MonoBehaviour:
   m_ObjectHideFlags: 0
