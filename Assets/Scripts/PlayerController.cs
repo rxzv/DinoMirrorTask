@@ -16,7 +16,8 @@ public class PlayerController : NetworkBehaviour
     [Header("Animation")]
     [SerializeField] private Animator animator;
     private Vector3 lastPosition;
-
+    private float turnSmoothVelocity;
+    public float turnSmoothTime = 0.1f;
     private void Start()
     {
         characterController = GetComponent<CharacterController>();
@@ -57,9 +58,17 @@ public class PlayerController : NetworkBehaviour
     {
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
-        Vector3 move = transform.right * horizontal + transform.forward * vertical;
-        characterController.Move(move * speed * Time.deltaTime);
-        
+    
+        Vector3 moveDirection = new Vector3(horizontal, 0f, vertical).normalized;
+    
+        if (moveDirection.magnitude >= 0.1f)
+        {
+            float targetAngle = Mathf.Atan2(moveDirection.x, moveDirection.z) * Mathf.Rad2Deg;
+            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
+            transform.rotation = Quaternion.Euler(0f, angle, 0f);
+            Vector3 move = transform.forward * moveDirection.magnitude;
+            characterController.Move(move * speed * Time.deltaTime);
+        }
         bool isRunning = (transform.position - lastPosition).magnitude > 0.001f;
         animator.SetBool("IsRunning", isRunning);
         lastPosition = transform.position;
