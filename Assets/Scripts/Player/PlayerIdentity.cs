@@ -1,0 +1,35 @@
+﻿using Mirror;
+using UnityEngine;
+
+/// <summary>
+/// базовая сетевая сущность игрока
+/// </summary>
+[RequireComponent(typeof(NetworkIdentity))]
+public class PlayerIdentity : NetworkBehaviour
+{   
+    [SyncVar(hook = nameof(OnNicknameChanged))] 
+    private string _nickname = "Player";
+    public string Nickname { get { return _nickname; }}
+
+    private PlayerNickname _nicknameDisplay;
+    
+    private void Start()
+    {
+        _nicknameDisplay = GetComponent<PlayerNickname>();
+        if (!isLocalPlayer) return;
+        string defaultNick = "Player" + Random.Range(1000, 9999);
+        string savedNick = PlayerPrefs.GetString("PlayerNick", defaultNick);
+        CmdSetNickname(savedNick);
+    }
+    
+    [Command]
+    private void CmdSetNickname(string newNickname)
+    {
+        _nickname = newNickname;
+    }
+
+    private void OnNicknameChanged(string _, string newNick)
+    {
+        _nicknameDisplay.UpdateNickname(newNick);
+    }
+}
